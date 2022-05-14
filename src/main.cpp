@@ -770,8 +770,8 @@ void TCP_handler(u8 s)
 
   else if (st == SnSR::CLOSE_WAIT)
   {
-    Ethernet.socketDisconnect(s);
-    log_i("%d:CloseWait\r\n", s);
+    Ethernet.socketDisconnect(s); 
+    log_i("%d:CloseWait\r\n", s); 
   }
   else if (st == SnSR::CLOSED)
   {
