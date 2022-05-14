@@ -149,5 +149,5 @@ void returnOK();
 void WebServerHandler(u8 s);
 void TCP_handler(u8 s);
 void UDPhandler(void);
-void zobraz_stranky(u8 socket,const char *ptrNaStranky);
+void zobraz_stranky(const char *ptrNaStranky);
 #endif

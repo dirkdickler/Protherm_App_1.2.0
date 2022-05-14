@@ -39,7 +39,7 @@ IPAddress subnet(255, 255, 255, 0);
 IPAddress primaryDNS(8, 8, 8, 8);   // optional
 IPAddress secondaryDNS(8, 8, 4, 4); // optional
 
-EthernetWebServer server_LAN(8080);
+EthernetWebServer server_LAN(80);
 EthernetUDP Udp;
 char packetBuffer[100]; // buffer to hold incoming packet,
 
@@ -60,6 +60,39 @@ void Loop_10ms()
   citac++;
 }
 
+void handleRoot()
+{
+#define BUFFER_SIZE 512
+
+  char temp[BUFFER_SIZE];
+  int sec = millis() / 1000;
+  int min = sec / 60;
+  int hr = min / 60;
+  int day = hr / 24;
+
+  hr = hr % 24;
+
+  snprintf(temp, BUFFER_SIZE - 1,
+           "<html>\
+<head>\
+<meta http-equiv='refresh' content='5'/>\
+<title>%s</title>\
+<style>\
+body { background-color: #cccccc; font-family: Arial, Helvetica, Sans-Serif; Color: #000088; }\
+</style>\
+</head>\
+<body>\
+<h1>Hello from %s</h1>\
+<h3>running EthernetWebServer</h3>\
+<h3>on %s</h3>\
+<p>Uptime: %d d %02d:%02d:%02d</p>\
+<img src=\"/test.svg\" />\
+</body>\
+</html>",
+           BOARD_NAME, BOARD_NAME, SHIELD_TYPE, day, hr, min % 60, sec % 60);
+
+  server_LAN.send(200, F("text/html"), temp);
+}
 void handleNotFound()
 {
   String message = F("File Not Found\n\n");
@@ -266,7 +299,7 @@ void FuncServer_On(void)
   server_LAN.on("/", HTTP_GET, []()
                 {
               ET_LOGWARN(F("Dosel pozadavek na Handle ROot"));
-              server_LAN.send(200, F("text/plain"), page_hlavna); });
+              handleRoot(); });
 
   server_LAN.on(F("/heslo"), []()
                 {
@@ -294,9 +327,11 @@ void FuncServer_On(void)
   server_LAN.serveStatic("/vlajka1", SPIFFS, "/CanadaFlag_1.png");
   server_LAN.serveStatic("/vlajka2", SPIFFS, "/CanadaFlag_2.png");
   server_LAN.serveStatic("/vlajka3", SPIFFS, "/CanadaFlag_3.jpg");
-  server_LAN.on("/main", HTTP_GET, testFunct);
-  server_LAN.on("/hlavne", HTTP_GET, hlavne);
 
+  server_LAN.on("/main", []()
+                { zobraz_stranky(DebugLog_html); });
+  server_LAN.on("/hlavne", []()
+                { zobraz_stranky(page_hlavna); });
   server_LAN.on("/subor", HTTP_GET, ReadSuborzSD);
 
   server_LAN.on("/get", HTTP_GET, []()
@@ -407,7 +442,7 @@ void t1_MAIN(void *arg)
   while (1)
   {
     UDPhandler();
-    // WebServerHandler(6);
+    //  WebServerHandler(6);
     TCP_handler(TCPsocket);
     delay(10);
   }
@@ -442,7 +477,7 @@ void t2_ethTask(void *arg)
   }
 }
 
-void zobraz_stranky(u8 socket, const char *ptrNaStranky)
+void zobraz_stranky(const char *ptrNaStranky)
 {
   char locBuff[2048];
   uint32_t index = 0;
@@ -450,7 +485,7 @@ void zobraz_stranky(u8 socket, const char *ptrNaStranky)
   // log_i("Stranky maju delku %u", strlen(ptrNaStranky)); // Serial.println("Main ma delku" + String(strlen(DebugLog_html)));
 
   snprintf(locBuff, sizeof(locBuff), "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: %u\r\nConnection: close\r\n\r\n", strlen((char *)ptrNaStranky));
-  // send(socket, (u8 *)locBuff, strlen((char *)locBuff));
+  server_LAN.sendContent(locBuff);
 
   memset(locBuff, 0, sizeof(locBuff));
   u32 kolkoPoslnaych = 0;
@@ -461,6 +496,7 @@ void zobraz_stranky(u8 socket, const char *ptrNaStranky)
     {
       memcpy(locBuff, &ptrNaStranky[kolkoPoslnaych], velkostStranek);
       // send(socket, (u8 *)locBuff, velkostStranek);
+      server_LAN.sendContent(locBuff, velkostStranek);
       kolkoPoslnaych = velkostStranek;
     }
     else
@@ -470,12 +506,14 @@ void zobraz_stranky(u8 socket, const char *ptrNaStranky)
       {
         memcpy(locBuff, &ptrNaStranky[kolkoPoslnaych], zostava);
         //  send(socket, (u8 *)locBuff, zostava);
+        server_LAN.sendContent(locBuff, zostava);
         kolkoPoslnaych += zostava;
       }
       else
       {
         memcpy(locBuff, &ptrNaStranky[kolkoPoslnaych], 1000);
         // send(socket, (u8 *)locBuff, 1000);
+        server_LAN.sendContent(locBuff, 1000);
         kolkoPoslnaych += 1000;
       }
     }
@@ -579,13 +617,13 @@ void System_init(void)
   Ethernet.setRstPin(WIZ_RES_pin); // 14
   Ethernet.setCsPin(WIZ_CS_pin);
   Ethernet.hardreset();
-  Ethernet.init(ETHERNET3_pocet_SOCK_NUM);
+  Ethernet.init(WIZ_CS_pin);
 
   // uint16_t index = millis() % NUMBER_OF_MAC;
   // log_i("Using mac index = %u", index);
 
   Ethernet.begin(LAN_MAC, local_IP, subnet, gateway, primaryDNS);
-  // Udp.begin(9999); // toto musi byt az po  Ethernet.begin
+  Udp.begin(9999); // toto musi byt az po  Ethernet.begin
 
   // String slovo;
   // slovo = String(Ethernet.localIP());
