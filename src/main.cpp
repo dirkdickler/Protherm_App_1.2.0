@@ -632,7 +632,8 @@ void System_init(void)
   log_i("Konec funkcie..");
 }
 
-EthernetClass ddd;
+#warning !!! Tu si precitaj toto dole
+//TODO pre socket funncie musis v subore Ethernet_Generic.hpp  a tuto triesu class EthernetClass  a v nej musis zmenit socket funkcie z private na public, ze to private pred nimi odkomentujes
 void TCP_handler(u8 s)
 {
   char loc_buff[200];
