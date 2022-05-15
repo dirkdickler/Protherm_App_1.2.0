@@ -3,6 +3,9 @@
 #include "define.h"
 #include <SPI.h>
 
+#include <WiFi.h>
+#include <WebServer.h>
+
 #include "Ethernet_Generic.h"
 #include <EthernetWebServer.h>
 
@@ -38,9 +41,12 @@ IPAddress subnet(255, 255, 255, 0);
 IPAddress primaryDNS(8, 8, 8, 8);   // optional
 IPAddress secondaryDNS(8, 8, 4, 4); // optional
 
+WebServer wifiServer(80);
 EthernetWebServer server_LAN(80);
 EthernetUDP Udp;
 
+const char *ssid = "semiart";
+const char *password = "aabbccddff";
 char packetBuffer[100]; // buffer to hold incoming packet,
 
 char NazovSiete[30];
@@ -58,6 +64,11 @@ float citac = 0;
 void Loop_10ms()
 {
   citac++;
+}
+
+void handleWiFiRoot()
+{
+  wifiServer.send(200, "text/plain", "Hello from ESP32 WiFi!");
 }
 
 void handleRoot()
@@ -230,9 +241,20 @@ void setup(void)
   NacitajEEPROM_setting();
   System_init();
 
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(500);
+    Serial.print(".");
+  }
+
   log_i("Idem citat subore z SD karty po init web");
   NacitajSuborzSD();
   FuncServer_On();
+
+  wifiServer.on("/", handleWiFiRoot);
+  wifiServer.begin();
 
   server_LAN.begin();
 
@@ -289,6 +311,7 @@ void loop(void)
   // runner.execute();
   timer_10ms.update();
   server_LAN.handleClient();
+  wifiServer.handleClient();
 
   delay(5);
 }
@@ -521,7 +544,7 @@ void zobraz_stranky(const char *ptrNaStranky)
 }
 
 #warning !!! Tu si precitaj toto dole
-//TODO pre socket funncie musis v subore Ethernet_Generic.hpp  a tuto triesu class EthernetClass  a v nej musis zmenit socket funkcie z private na public, ze to private pred nimi odkomentujes
+// TODO pre socket funncie musis v subore Ethernet_Generic.hpp  a tuto triesu class EthernetClass  a v nej musis zmenit socket funkcie z private na public, ze to private pred nimi odkomentujes
 void TCP_handler(u8 s)
 {
   char loc_buff[200];
@@ -659,8 +682,8 @@ void TCP_handler(u8 s)
 
   else if (st == SnSR::CLOSE_WAIT)
   {
-    Ethernet.socketDisconnect(s); 
-    log_i("%d:CloseWait\r\n", s); 
+    Ethernet.socketDisconnect(s);
+    log_i("%d:CloseWait\r\n", s);
   }
   else if (st == SnSR::CLOSED)
   {
@@ -830,4 +853,3 @@ void System_init(void)
 
   log_i("Konec funkcie..");
 }
-
