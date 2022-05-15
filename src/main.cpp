@@ -2,11 +2,10 @@
 #include <esp_task_wdt.h>
 #include "define.h"
 #include <SPI.h>
-//#include "Ethernet3.h"
+
 #include "Ethernet_Generic.h"
 #include <EthernetWebServer.h>
-//#include <utility\socket.h>
-//#include "utility\w5500.h"
+
 #include "FS.h"
 #include "SD.h"
 #include <Ticker.h>
@@ -41,6 +40,7 @@ IPAddress secondaryDNS(8, 8, 4, 4); // optional
 
 EthernetWebServer server_LAN(80);
 EthernetUDP Udp;
+
 char packetBuffer[100]; // buffer to hold incoming packet,
 
 char NazovSiete[30];
@@ -520,118 +520,6 @@ void zobraz_stranky(const char *ptrNaStranky)
   } while (kolkoPoslnaych < velkostStranek);
 }
 
-void System_init(void)
-{
-  Serial.println("Nastavujem DEBUG LOGs  priklady v pliaformIO ini musis mat nastavene nejaku uroven -DCORE_DEBUG_LEVEL=5 ");
-  log_i("Zacatek funkcie..");
-  // ESP_LOGD("EXAMPLE", "This doesn't show");
-  // ESP_LOGI("","Func:System_init  begin..");
-  // ESP_LOGI("", " TESTIK Ix storage usedd: %ld/%ld", 123, 124);
-  // log_w("TESTIK Ix storage usedd: %f/%f", 12.3, 12.4);
-  // ESP_LOGW("", "TESTIK Wx storage usedd: %ld/%ld", 23, 24);
-
-  DIN[input1].pin = DI1_pin;
-  DIN[input2].pin = DI2_pin;
-  DIN[input3].pin = DI3_pin;
-  DIN[input4].pin = DI4_pin;
-  DIN[input_SDkarta].pin = SD_CD_pin;
-
-  pinMode(ADC_gain_pin, OUTPUT_OPEN_DRAIN);
-  pinMode(SD_CS_pin, OUTPUT);
-  pinMode(WIZ_CS_pin, OUTPUT);
-  pinMode(WIZ_RES_pin, OUTPUT);
-
-  pinMode(LEDstatus_pin, OUTPUT);
-  // WizChip_RST_HI();
-  // WizChip_CS_HI();
-
-  pinMode(DI1_pin, INPUT_PULLUP);
-  pinMode(DI2_pin, INPUT_PULLUP);
-  pinMode(DI3_pin, INPUT_PULLUP);
-  pinMode(DI4_pin, INPUT_PULLUP);
-  pinMode(SD_CD_pin, INPUT_PULLUP);
-  // pinMode(WIZ_INT_pin, INPUT_PULLUP); //neni
-  pinMode(Joy_up_pin, INPUT_PULLUP);
-  pinMode(Joy_dn_pin, INPUT_PULLUP);
-  pinMode(Joy_Butt_pin, INPUT_PULLUP);
-  pinMode(Joy_left_pin, INPUT_PULLUP);
-  pinMode(Joy_right_pin, INPUT_PULLUP);
-
-  // RTC_Date Pccc;
-  // Wire.begin(SCL_pin, SDA_pin);
-  // PCFrtc.begin();
-  // PCFrtc.setDateTime(2019, 4, 1, 12, 33, 59);
-  // Pccc = PCFrtc.getDateTime();
-  // rtc.setTime(Pccc.second, Pccc.minute, Pccc.hour, Pccc.day, Pccc.month, Pccc.year); // 17th Jan 2021 15:24:30
-
-  // NaplnWizChipStrukturu();
-
-  // SDSPI.setFrequency(10000000); // nezabudni ze pri SD.begin(SD_CS_pin, SDSPI,10000000)) budes menit fre na hodnotu v zavorkach
-  //  SDSPI.setClockDivider(SPI_CLOCK_DIV2);
-  // SDSPI.begin(SD_sck, SD_miso, SD_mosi, -1);
-
-  // WizChip_Reset();
-  // WizChip_Config(&eth);
-
-  SPI.setFrequency(15000000);
-  SPI.begin(SD_sck, SD_miso, SD_mosi, -1);
-  pinMode(SD_CS_pin, OUTPUT);
-  pinMode(SD_CD_pin, INPUT_PULLUP);
-
-  // if (!SD.begin(SD_CS_pin, SPI))
-  // {
-  // 	log_i("Card Mount begin: ERROR");
-  // }
-  // else
-  // {
-  // 	log_i("Card Mount begin: OK");
-  // }
-
-  if (!SPIFFS.begin(true))
-  {
-    log_i("SPIFS begin:: ERROR");
-  }
-  else
-  {
-    log_i("SPIFS begin:: OK");
-  }
-
-  // File file = SPIFFS.open("/page2.html");
-  // if (!file)
-  // {
-  // 	Serial.println("Failed to open file for reading");
-  // 	return;
-  // }
-
-  // Serial.println("File Content:");
-  // while (file.available())
-  // {
-  // 	Serial.write(file.read());
-  // }
-  // file.close();
-
-  log_i("Starting AdvancedWebServer on %s ", BOARD_NAME);
-  log_i(" with %s", SHIELD_TYPE);
-  log_i("ETHERNET_WEBSERVER_VERSION si pozri v H subore");
-
-  Ethernet.setRstPin(WIZ_RES_pin); // 14
-  Ethernet.setCsPin(WIZ_CS_pin);
-  Ethernet.hardreset();
-  Ethernet.init(WIZ_CS_pin);
-
-  // uint16_t index = millis() % NUMBER_OF_MAC;
-  // log_i("Using mac index = %u", index);
-
-  Ethernet.begin(LAN_MAC, local_IP, subnet, gateway, primaryDNS);
-  Udp.begin(9999); // toto musi byt az po  Ethernet.begin
-
-  // String slovo;
-  // slovo = String(Ethernet.localIP());
-  // log_i("Connected! IP address: %s", slovo);
-
-  log_i("Konec funkcie..");
-}
-
 #warning !!! Tu si precitaj toto dole
 //TODO pre socket funncie musis v subore Ethernet_Generic.hpp  a tuto triesu class EthernetClass  a v nej musis zmenit socket funkcie z private na public, ze to private pred nimi odkomentujes
 void TCP_handler(u8 s)
@@ -830,3 +718,116 @@ void UDPhandler(void)
     Udp.endPacket();
   }
 }
+
+void System_init(void)
+{
+  Serial.println("Nastavujem DEBUG LOGs  priklady v pliaformIO ini musis mat nastavene nejaku uroven -DCORE_DEBUG_LEVEL=5 ");
+  log_i("Zacatek funkcie..");
+  // ESP_LOGD("EXAMPLE", "This doesn't show");
+  // ESP_LOGI("","Func:System_init  begin..");
+  // ESP_LOGI("", " TESTIK Ix storage usedd: %ld/%ld", 123, 124);
+  // log_w("TESTIK Ix storage usedd: %f/%f", 12.3, 12.4);
+  // ESP_LOGW("", "TESTIK Wx storage usedd: %ld/%ld", 23, 24);
+
+  DIN[input1].pin = DI1_pin;
+  DIN[input2].pin = DI2_pin;
+  DIN[input3].pin = DI3_pin;
+  DIN[input4].pin = DI4_pin;
+  DIN[input_SDkarta].pin = SD_CD_pin;
+
+  pinMode(ADC_gain_pin, OUTPUT_OPEN_DRAIN);
+  pinMode(SD_CS_pin, OUTPUT);
+  pinMode(WIZ_CS_pin, OUTPUT);
+  pinMode(WIZ_RES_pin, OUTPUT);
+
+  pinMode(LEDstatus_pin, OUTPUT);
+  // WizChip_RST_HI();
+  // WizChip_CS_HI();
+
+  pinMode(DI1_pin, INPUT_PULLUP);
+  pinMode(DI2_pin, INPUT_PULLUP);
+  pinMode(DI3_pin, INPUT_PULLUP);
+  pinMode(DI4_pin, INPUT_PULLUP);
+  pinMode(SD_CD_pin, INPUT_PULLUP);
+  // pinMode(WIZ_INT_pin, INPUT_PULLUP); //neni
+  pinMode(Joy_up_pin, INPUT_PULLUP);
+  pinMode(Joy_dn_pin, INPUT_PULLUP);
+  pinMode(Joy_Butt_pin, INPUT_PULLUP);
+  pinMode(Joy_left_pin, INPUT_PULLUP);
+  pinMode(Joy_right_pin, INPUT_PULLUP);
+
+  // RTC_Date Pccc;
+  // Wire.begin(SCL_pin, SDA_pin);
+  // PCFrtc.begin();
+  // PCFrtc.setDateTime(2019, 4, 1, 12, 33, 59);
+  // Pccc = PCFrtc.getDateTime();
+  // rtc.setTime(Pccc.second, Pccc.minute, Pccc.hour, Pccc.day, Pccc.month, Pccc.year); // 17th Jan 2021 15:24:30
+
+  // NaplnWizChipStrukturu();
+
+  // SDSPI.setFrequency(10000000); // nezabudni ze pri SD.begin(SD_CS_pin, SDSPI,10000000)) budes menit fre na hodnotu v zavorkach
+  //  SDSPI.setClockDivider(SPI_CLOCK_DIV2);
+  // SDSPI.begin(SD_sck, SD_miso, SD_mosi, -1);
+
+  // WizChip_Reset();
+  // WizChip_Config(&eth);
+
+  SPI.setFrequency(15000000);
+  SPI.begin(SD_sck, SD_miso, SD_mosi, -1);
+  pinMode(SD_CS_pin, OUTPUT);
+  pinMode(SD_CD_pin, INPUT_PULLUP);
+
+  // if (!SD.begin(SD_CS_pin, SPI))
+  // {
+  // 	log_i("Card Mount begin: ERROR");
+  // }
+  // else
+  // {
+  // 	log_i("Card Mount begin: OK");
+  // }
+
+  if (!SPIFFS.begin(true))
+  {
+    log_i("SPIFS begin:: ERROR");
+  }
+  else
+  {
+    log_i("SPIFS begin:: OK");
+  }
+
+  // File file = SPIFFS.open("/page2.html");
+  // if (!file)
+  // {
+  // 	Serial.println("Failed to open file for reading");
+  // 	return;
+  // }
+
+  // Serial.println("File Content:");
+  // while (file.available())
+  // {
+  // 	Serial.write(file.read());
+  // }
+  // file.close();
+
+  log_i("Starting AdvancedWebServer on %s ", BOARD_NAME);
+  log_i(" with %s", SHIELD_TYPE);
+  log_i("ETHERNET_WEBSERVER_VERSION si pozri v H subore");
+
+  Ethernet.setRstPin(WIZ_RES_pin); // 14
+  Ethernet.setCsPin(WIZ_CS_pin);
+  Ethernet.hardreset();
+  Ethernet.init(WIZ_CS_pin);
+
+  // uint16_t index = millis() % NUMBER_OF_MAC;
+  // log_i("Using mac index = %u", index);
+
+  Ethernet.begin(LAN_MAC, local_IP, subnet, gateway, primaryDNS);
+  Udp.begin(9999); // toto musi byt az po  Ethernet.begin
+
+  // String slovo;
+  // slovo = String(Ethernet.localIP());
+  // log_i("Connected! IP address: %s", slovo);
+
+  log_i("Konec funkcie..");
+}
+

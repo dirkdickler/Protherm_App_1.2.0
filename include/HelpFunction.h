@@ -2,14 +2,17 @@
 #define __HelpFunction_H
 
 #include <Arduino.h>
-//#include"constants.h"
+#include"main.h"
 
 
 #define ComDebug(x) Serial.print(x);
 #define ComDebugln(x) Serial.println(x);
 
-char **split(char **argv, int *argc, char *string, const char delimiter, int allowempty);
 
+
+
+
+char **split(char **argv, int *argc, char *string, const char delimiter, int allowempty);
 String ConvetWeekDay_UStoCZ(tm *timeInfoPRT);
 String ConvetWeekDay_UStoSK(tm *timeInfoPRT);
 bool SkontrolujCiJePovolenyDenvTyzdni(u8 Obraz, tm *timeInfoPRT);

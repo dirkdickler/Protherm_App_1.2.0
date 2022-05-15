@@ -6,6 +6,7 @@
 #include <Arduino.h>
 #include "SPI.h"
 #include "define.h"
+
 #include "constants.h"
 //#include "WizChip_my_API.h"
 #include <ESP32Time.h>
@@ -119,6 +120,8 @@ extern bool RTC_cas_OK;
 extern u16 AN_Pot1_Raw;
 //extern PCF8563_Class PCFrtc;
 
+
+
 void Loop_1ms(void);
 void Loop_10ms(void);
 void Loop_100ms(void);
@@ -138,7 +141,7 @@ String handle_Zadavanie_IP_setting(void);
 void encoder();
 //void TCP_handler(uint8_t s, uint16_t port);
 
-void System_init(void);
+
 
 void t1_MAIN(void *arg); //void t1_MAIN();
 void t2_ethTask(void *arg);
@@ -149,5 +152,7 @@ void returnOK();
 void WebServerHandler(u8 s);
 void TCP_handler(u8 s);
 void UDPhandler(void);
+
+void System_init(void);
 void zobraz_stranky(const char *ptrNaStranky);
 #endif

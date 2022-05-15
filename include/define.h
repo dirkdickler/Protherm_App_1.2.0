@@ -60,8 +60,7 @@
 #define EE_zacateKaret_1 200
 #define EE_zacateKaret_2 1300 // EE_zacateKaret + 100*11tj 1300
 
-#define DEBUG_ETHERNET_WEBSERVER_PORT Serial
-#define _ETHERNET_WEBSERVER_LOGLEVEL_ 0
+
 
 #define sbi(adr, bitt) (adr |= (1 << bitt))
 #define cbi(adr, bitt) (adr &= ~(1 << bitt))
@@ -99,10 +98,14 @@ FS *filesystem = &LITTLEFS;
 #endif
 
 
+#define DEBUG_ETHERNET_WEBSERVER_PORT Serial
+#define _ETHERNET_WEBSERVER_LOGLEVEL_ 0
 #define _ETG_LOGLEVEL_                      3
 #define ETHERNET_USE_ESP32
 #define BOARD_TYPE "ESP32"
 #define BOARD_NAME BOARD_TYPE
+
+
 
 #define USE_ETHERNET_WRAPPER    false
 

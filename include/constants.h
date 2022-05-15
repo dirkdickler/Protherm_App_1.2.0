@@ -1,9 +1,10 @@
-﻿#ifndef INC_CONSTANST_H
+﻿#pragma once
+
+#ifndef INC_CONSTANST_H
 #define INC_CONSTANST_H
 
 #include <Arduino.h>
 #include "define.h"
-//#include <ESPAsyncWebServer.h>
 
 static const char deviceName[31] = {"Zapsi Eng FW 1                "};
 static const char MCU_type[9] = {"F412RE"};

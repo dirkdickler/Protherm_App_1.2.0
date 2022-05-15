@@ -2,10 +2,12 @@
 #include <Arduino.h>
 #include "constants.h"
 #include "Pin_assigment.h"
-//#include "HelpFunction.h"
+#include "HelpFunction.h"
 #include "define.h"
 #include "constants.h"
 #include "main.h"
+
+
 #include <EEPROM.h>
 
 #include "SD.h"
@@ -16,6 +18,7 @@
 
 //EthernetUDP Udp;
 //char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; // buffer to hold incoming packet,
+
 
 
 void NacitajSuborzSD(void)
