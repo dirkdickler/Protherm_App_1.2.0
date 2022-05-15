@@ -59,6 +59,7 @@ static String jsonString;
 FLAGS_t flg;
 
 float citac = 0;
+uint8_t TX_BUF[2500];
 ; // int reqCount = 0; // number of requests received
 
 void Loop_10ms()
@@ -231,7 +232,6 @@ void ReadSuborzSD()
   NacitajSuborzSD();
 }
 
-char buff_extra[4001];
 
 void setup(void)
 {
@@ -371,7 +371,6 @@ void FuncServer_On(void)
   log_i("Koniec funkcie");
 }
 
-uint8_t TX_BUF[2500];
 
 void Task_handle_ADE9078_Code(void *arg)
 {
@@ -547,6 +546,7 @@ void zobraz_stranky(const char *ptrNaStranky)
 // TODO pre socket funncie musis v subore Ethernet_Generic.hpp  a tuto triesu class EthernetClass  a v nej musis zmenit socket funkcie z private na public, ze to private pred nimi odkomentujes
 void TCP_handler(u8 s)
 {
+  
   char loc_buff[200];
   uint8_t st = W5100.readSnSR(s);
   if (st == SnSR::ESTABLISHED)
