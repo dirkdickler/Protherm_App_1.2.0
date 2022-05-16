@@ -106,7 +106,7 @@ FS *filesystem = &LITTLEFS;
 
 
 
-#define USE_ETHERNET_WRAPPER    false
+#define USE_ETHERNET_WRAPPER    true
 
 #define USE_UIP_ETHERNET          false
 #define USE_ETHERNET_PORTENTA_H7  false

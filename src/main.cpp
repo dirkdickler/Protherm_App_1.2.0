@@ -5,9 +5,14 @@
 
 #include <WiFi.h>
 #include <WebServer.h>
+//#include <AsyncTCP.h>
+//#include <ESPAsyncWebServer.h>
 
 #include "Ethernet_Generic.h"
 #include <EthernetWebServer.h>
+
+//#include <AsyncElegantOTA.h> //https://randomnerdtutorials.com/esp32-ota-over-the-air-arduino/#1-basic-elegantota
+//#include <elegantWebpage.h>
 
 #include "FS.h"
 #include "SD.h"
@@ -43,8 +48,9 @@ IPAddress subnet(255, 255, 255, 0);
 IPAddress primaryDNS(8, 8, 8, 8);   // optional
 IPAddress secondaryDNS(8, 8, 4, 4); // optional
 
-WebServer wifiServer(80);
 EthernetWebServer server_LAN(80);
+WebServer wifiServer(80);
+// AsyncWebServer wifiServer(80);
 EthernetUDP Udp;
 
 const char *ssid = "semiart";
@@ -256,15 +262,33 @@ void setup(void)
   NacitajSuborzSD();
   FuncServer_On();
 
-  wifiServer.on("/", handleWiFiRoot);
-
-  if (!WiFi.config(local_IPWifi, gateway, subnet, primaryDNS, secondaryDNS))
-  {
-    log_i("STA Failed to configure");
-  }
   WiFi.begin(ssid, password);
 
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("");
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+
   server_LAN.begin();
+
+  // wifiServer.on("/status", HTTP_GET, [](AsyncWebServerRequest *request)
+  //               {
+  // 				 char ttt[500];
+  // 				 snprintf(ttt, sizeof(ttt),"Firmware :%s<br>"
+  // 								  "Sila signalu WIFI(-30 je akoze OK):%i<br>",
+  // 								  								firmware, WiFi.RSSI());
+
+  // 				 request->send(200, "text/html", ttt); });
+
+  // AsyncElegantOTA.begin(&wifiServer, "admin", "admin"); // Start ElegantOTA
+  wifiServer.on("/", handleWiFiRoot);
+  wifiServer.begin();
 
   timer_10ms.start();
   esp_task_wdt_init(WDT_TIMEOUT, true); // enable panic so ESP32 restarts
@@ -321,8 +345,7 @@ void loop(void)
   server_LAN.handleClient();
   wifiServer.handleClient();
   led.update();
-
-  delay(5);
+  
 }
 
 void FuncServer_On(void)
@@ -471,9 +494,9 @@ void t1_MAIN(void *arg)
 
   while (1)
   {
-    UDPhandler();
-    //  WebServerHandler(6);
-    TCP_handler(TCPsocket);
+    // UDPhandler();
+    //   WebServerHandler(6);
+    // TCP_handler(TCPsocket);
     delay(10);
   }
 }
@@ -489,6 +512,8 @@ void t2_ethTask(void *arg)
     // ESP.getFreeHeap();  xPortGetFreeHeapSize()
 
     log_i("RTOS free HeAP:%d", ESP.getFreeHeap());
+    log_i("signal RSSI:%d", WiFi.RSSI());
+
     if (flg.TCPsocketConneknuty == true)
     {
       snprintf((char *)TX_BUF, sizeof(TX_BUF), "\r\nADE9078 Data: U1 = %.03fV  U2 = %.03fV   U2 = %.03fV  I1 = %.03fA  I2 = %.03fA  I3 = %.03fA",
