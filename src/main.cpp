@@ -21,6 +21,7 @@
 #include "Pin_assigment.h"
 #include "esp_log.h"
 #include "ADE9078.h"
+#include "MyBlinker.h"
 
 //#include <TaskScheduler.h>
 
@@ -35,6 +36,7 @@ TaskHandle_t Task_handleADE9078;
 const char *www_username = "qqq";
 const char *www_password = "1234";
 
+IPAddress local_IPWifi(192, 168, 1, 9);
 IPAddress local_IP(192, 168, 1, 10);
 IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
@@ -52,6 +54,7 @@ char packetBuffer[100]; // buffer to hold incoming packet,
 char NazovSiete[30];
 char Heslo[30];
 
+LedBlinker led(LED_pin, COMMON_POSITIVE);
 Ticker timer_10ms(Loop_10ms, 100, 0, MILLIS);
 static JSONVar myObject, AjaxObjekt;
 static String jsonString;
@@ -69,6 +72,7 @@ void Loop_10ms()
 
 void handleWiFiRoot()
 {
+  log_i("Hello from ESP32 WiFi!");
   wifiServer.send(200, "text/plain", "Hello from ESP32 WiFi!");
 }
 
@@ -232,7 +236,6 @@ void ReadSuborzSD()
   NacitajSuborzSD();
 }
 
-
 void setup(void)
 {
 
@@ -241,20 +244,25 @@ void setup(void)
   NacitajEEPROM_setting();
   System_init();
 
-  WiFi.begin(ssid, password);
-
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(500);
-    Serial.print(".");
-  }
+  led.blink(200 /* time on */,
+            200 /* time off */,
+            3 /* cycles */,
+            1000 /* pause between secuences */,
+            0 /* secuences */,
+            NULL /* function to call when finished */
+  );
 
   log_i("Idem citat subore z SD karty po init web");
   NacitajSuborzSD();
   FuncServer_On();
 
   wifiServer.on("/", handleWiFiRoot);
-  wifiServer.begin();
+
+  if (!WiFi.config(local_IPWifi, gateway, subnet, primaryDNS, secondaryDNS))
+  {
+    log_i("STA Failed to configure");
+  }
+  WiFi.begin(ssid, password);
 
   server_LAN.begin();
 
@@ -312,6 +320,7 @@ void loop(void)
   timer_10ms.update();
   server_LAN.handleClient();
   wifiServer.handleClient();
+  led.update();
 
   delay(5);
 }
@@ -370,7 +379,6 @@ void FuncServer_On(void)
   // server.onNotFound(handleNotFound);
   log_i("Koniec funkcie");
 }
-
 
 void Task_handle_ADE9078_Code(void *arg)
 {
@@ -479,14 +487,6 @@ void t2_ethTask(void *arg)
   while (1)
   {
     // ESP.getFreeHeap();  xPortGetFreeHeapSize()
-    if (digitalRead(LEDstatus_pin) == 1)
-    {
-      digitalWrite(LEDstatus_pin, 0);
-    }
-    else
-    {
-      digitalWrite(LEDstatus_pin, 1);
-    }
 
     log_i("RTOS free HeAP:%d", ESP.getFreeHeap());
     if (flg.TCPsocketConneknuty == true)
@@ -546,7 +546,7 @@ void zobraz_stranky(const char *ptrNaStranky)
 // TODO pre socket funncie musis v subore Ethernet_Generic.hpp  a tuto triesu class EthernetClass  a v nej musis zmenit socket funkcie z private na public, ze to private pred nimi odkomentujes
 void TCP_handler(u8 s)
 {
-  
+
   char loc_buff[200];
   uint8_t st = W5100.readSnSR(s);
   if (st == SnSR::ESTABLISHED)
@@ -763,7 +763,6 @@ void System_init(void)
   pinMode(WIZ_CS_pin, OUTPUT);
   pinMode(WIZ_RES_pin, OUTPUT);
 
-  pinMode(LEDstatus_pin, OUTPUT);
   // WizChip_RST_HI();
   // WizChip_CS_HI();
 
