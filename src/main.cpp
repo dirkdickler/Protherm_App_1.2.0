@@ -49,6 +49,7 @@ IPAddress primaryDNS(8, 8, 8, 8);   // optional
 IPAddress secondaryDNS(8, 8, 4, 4); // optional
 
 EthernetWebServer server_LAN(80);
+
 WebServer wifiServer(80);
 // AsyncWebServer wifiServer(80);
 EthernetUDP Udp;
@@ -342,10 +343,13 @@ void loop(void)
   esp_task_wdt_reset();
   // runner.execute();
   timer_10ms.update();
-  server_LAN.handleClient();
   wifiServer.handleClient();
-  led.update();
+
+  server_LAN.handleClient();
+  UDPhandler();
+  TCP_handler(TCPsocket);
   
+  led.update();
 }
 
 void FuncServer_On(void)
@@ -494,10 +498,8 @@ void t1_MAIN(void *arg)
 
   while (1)
   {
-    // UDPhandler();
-    //   WebServerHandler(6);
-    // TCP_handler(TCPsocket);
-    delay(10);
+
+    delay(5);
   }
 }
 
@@ -707,7 +709,7 @@ void TCP_handler(u8 s)
 
   else if (st == SnSR::CLOSE_WAIT)
   {
-    Ethernet.socketDisconnect(s);
+    Ethernet.socketClose(s);
     log_i("%d:CloseWait\r\n", s);
   }
   else if (st == SnSR::CLOSED)

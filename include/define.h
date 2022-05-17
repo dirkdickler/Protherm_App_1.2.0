@@ -99,8 +99,8 @@ FS *filesystem = &LITTLEFS;
 
 
 #define DEBUG_ETHERNET_WEBSERVER_PORT Serial
-#define _ETHERNET_WEBSERVER_LOGLEVEL_ 0
-#define _ETG_LOGLEVEL_                      3
+#define _ETHERNET_WEBSERVER_LOGLEVEL_ 4
+#define _ETG_LOGLEVEL_                      4
 #define BOARD_TYPE "ESP32"
 #define BOARD_NAME BOARD_TYPE
 
