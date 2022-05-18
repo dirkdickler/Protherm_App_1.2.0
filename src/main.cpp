@@ -348,7 +348,7 @@ void loop(void)
   server_LAN.handleClient();
   UDPhandler();
   TCP_handler(TCPsocket);
-  
+
   led.update();
 }
 
@@ -515,6 +515,13 @@ void t2_ethTask(void *arg)
 
     log_i("RTOS free HeAP:%d", ESP.getFreeHeap());
     log_i("signal RSSI:%d", WiFi.RSSI());
+    // static auto test = 6;
+    // test++;
+    // log_i("auto premenna :%d", test);
+    // auto testString = (String)"ahoj";
+    // log_i("auto premenna :%s", testString);
+    // testString += " vole" + String(test) + "zedels";
+    // log_i("auto premenna :%s", testString);
 
     if (flg.TCPsocketConneknuty == true)
     {
