@@ -2,6 +2,31 @@ v subore library.json  vymaz QNET lib  a potom z lib tree zmas celu kniznicu QNE
 
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+v subore: EthernetServer_Impl.h  a funkcii: EthernetClient EthernetServer::available()
+na ziaciatju zmen pocet socketov pre test menim z 8(MAX_SOCK_NUM) na 4 na
+
+bool listening = false;
+  uint8_t sockindex = 4; //MAX_SOCK_NUM;
+  EthernetChip_t chip;
+  uint8_t maxindex = 4; //MAX_SOCK_NUM;
+
+  chip = W5100.getChip();
+
+  if (chip == noChip)
+    return EthernetClient(4); //MAX_SOCK_NUM);
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+v subore: EthernetServer_Impl.h  a funkcii:  EthernetClient EthernetServer::available() 
+vo smycke  zmen disconnect na close  a to close musis mat upravene ako tu pod tymto 
+             connectionEthernet.socketClose(i);
+            //Ethernet.socketDisconnect(i);
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
 v subore socket_Impl.h   zmen tuto funkciu: void EthernetClass::socketClose(uint8_t s) na toto:
 
 void EthernetClass::socketClose(uint8_t s)
