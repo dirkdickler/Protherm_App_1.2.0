@@ -344,7 +344,6 @@ void loop(void)
   // runner.execute();
   timer_10ms.update();
   wifiServer.handleClient();
-
   server_LAN.handleClient();
   UDPhandler();
   TCP_handler(TCPsocket);
@@ -717,6 +716,7 @@ void TCP_handler(u8 s)
   else if (st == SnSR::CLOSE_WAIT)
   {
     Ethernet.socketClose(s);
+    //Ethernet.socketDisconnect(s);
     log_i("%d:CloseWait\r\n", s);
   }
   else if (st == SnSR::CLOSED)

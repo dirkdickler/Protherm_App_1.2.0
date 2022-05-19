@@ -1,0 +1,18 @@
+v subore library.json  vymaz QNET lib  a potom z lib tree zmas celu kniznicu QNET lib
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+v subore socket_Impl.h   zmen tuto funkciu: void EthernetClass::socketClose(uint8_t s) na toto:
+
+void EthernetClass::socketClose(uint8_t s)
+{
+  W5100.beginSPITransaction();
+  W5100.execCmdSn(s, Sock_CLOSE);
+  do
+  {
+    // Serial.println("Waiting...");
+    delayMicroseconds(100);
+  } while (W5100.readSnCR(s) != 0); // SOCK_CLOSED =0
+  W5100.endSPITransaction();
+}
+---------------------------------------------------------------------------------------------------------------------------------------------------
