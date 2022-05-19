@@ -1,0 +1,10 @@
+stevemarple/SoftWire@^2.0.8
+khoih-prog/EthernetWebServer@^2.2.0
+ottowinter/ESPAsyncWebServer-esphome@^2.1.0
+pfeerick/elapsedMillis@^1.0.6
+ayushsharma82/AsyncElegantOTA@^2.2.7
+arduino-libraries/Arduino_JSON@^0.1.0
+sstaub/Ticker@^4.4.0
+stevemarple/AsyncDelay@^1.1.2
+fbiego/ESP32Time@^1.0.4
+https://github.com/PaulStoffregen/Time
