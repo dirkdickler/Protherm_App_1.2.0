@@ -81,6 +81,12 @@ void handleWiFiRoot()
 {
   log_i("Hello from ESP32 WiFi!");
   wifiServer.send(200, "text/plain", "Hello from ESP32 WiFi!");
+
+   log_i("Idem nastovit novu silu vysielaca");
+  // WiFi.setTxPower(WIFI_POWER_7dBm);
+  //  int a = WiFi.getTxPower();
+  //   Serial.print("------------------------TX power:");
+  //   Serial.println(a);
 }
 
 void handleRoot()
@@ -262,7 +268,8 @@ void setup(void)
   log_i("Idem citat subore z SD karty po init web");
   NacitajSuborzSD();
   FuncServer_On();
-
+  
+  
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED)
@@ -290,6 +297,9 @@ void setup(void)
   // AsyncElegantOTA.begin(&wifiServer, "admin", "admin"); // Start ElegantOTA
   wifiServer.on("/", handleWiFiRoot);
   wifiServer.begin();
+  //  int a = WiFi.getTxPower();
+  //   Serial.print("------------------------TX power:");
+  //   Serial.println(a);
 
   timer_10ms.start();
   esp_task_wdt_init(WDT_TIMEOUT, true); // enable panic so ESP32 restarts

@@ -33,6 +33,10 @@ void handleEthernetRoot()
 void handleWiFiRoot() 
 {
   wifiServer.send(200, "text/plain", "Hello from ESP32 WiFi!");
+
+  log_i("Idem nastovit novu silu vysielaca");
+  WiFi.setTxPower(30);
+  log_i("nova WiFi sila  vysielaca je",WiFi.getTxPower());
 }
 
 void setup()
